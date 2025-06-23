@@ -1,4 +1,6 @@
 ﻿@model SeafoodApp.Models.PurchaseOrder
+@using Microsoft.AspNetCore.Mvc.Rendering
+
 @{
     ViewData["Title"] = "Tạo phiếu mua nguyên liệu";
 }
@@ -6,103 +8,88 @@
 <h2>@ViewData["Title"]</h2>
 
 <form asp-action="Create" method="post">
-    <div class="form-group">
-        <label asp-for="Code" class="control-label">Số phiếu</label>
-        <input asp-for="Code" class="form-control" />
-        <span asp-validation-for="Code" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="SupplierId" class="control-label">Nhà cung cấp</label>
-        <select asp-for="SupplierId" class="form-control" asp-items="ViewBag.SupplierList"></select>
-        <span asp-validation-for="SupplierId" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="CreatedDate" class="control-label">Ngày lập</label>
-        <input asp-for="CreatedDate" class="form-control" type="date" />
-        <span asp-validation-for="CreatedDate" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="SupplyDate" class="control-label">Ngày cung cấp</label>
-        <input asp-for="SupplyDate" class="form-control" type="date" />
-        <span asp-validation-for="SupplyDate" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label class="control-label">Sản phẩm</label>
-        <input type="text" name="ProductName" class="form-control" />
-    </div>
-
-    <div class="form-group">
-        <label class="control-label">Số lô</label>
-        <input type="text" name="BatchNumber" class="form-control" />
+    <div class="row">
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label asp-for="Code" class="form-label">Số phiếu</label>
+                <input asp-for="Code" class="form-control" />
+                <span asp-validation-for="Code" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="SupplierId" class="form-label">Nhà cung cấp</label>
+                <select asp-for="SupplierId" class="form-select" asp-items="ViewBag.SupplierList"></select>
+            </div>
+            <div class="mb-3">
+                <label asp-for="CreatedDate" class="form-label">Ngày lập</label>
+                <input asp-for="CreatedDate" class="form-control" type="date" />
+            </div>
+            <div class="mb-3">
+                <label asp-for="SupplyDate" class="form-label">Ngày cung cấp</label>
+                <input asp-for="SupplyDate" class="form-control" type="date" />
+            </div>
+            <div class="mb-3">
+                <label asp-for="ProductName" class="form-label">Sản phẩm</label>
+                <input asp-for="ProductName" class="form-control" />
+            </div>
+            <div class="mb-3">
+                <label asp-for="BatchNumber" class="form-label">Số lô</label>
+                <input asp-for="BatchNumber" class="form-control" />
+            </div>
+        </div>
     </div>
 
     <hr />
     <h4>Chi tiết</h4>
-    <table class="table" id="detailTable">
+    <table class="table table-bordered" id="detailTable">
         <thead>
             <tr>
                 <th>Size</th>
                 <th>Giá</th>
                 <th>Số lượng</th>
                 <th>Thành tiền</th>
-                <th></th>
+                <th style="width: 40px;"></th>
             </tr>
         </thead>
         <tbody>
             <tr>
                 <td><input name="Details[0].Size" class="form-control" /></td>
-                <td><input name="Details[0].UnitPrice" type="number" step="0.01" class="form-control" oninput="calcAmount(this)" /></td>
-                <td><input name="Details[0].Quantity" type="number" class="form-control" oninput="calcAmount(this)" /></td>
+                <td><input name="Details[0].UnitPrice" class="form-control" type="number" oninput="calc(this)" /></td>
+                <td><input name="Details[0].Quantity" class="form-control" type="number" oninput="calc(this)" /></td>
                 <td><input name="Details[0].Amount" class="form-control" readonly /></td>
-                <td><button type="button" class="btn btn-success" onclick="addRow()">+</button></td>
+                <td><button type="button" class="btn btn-sm btn-success" onclick="addRow()">+</button></td>
             </tr>
         </tbody>
     </table>
 
-    <div class="form-group mt-2">
-        <input type="submit" value="Lưu phiếu" class="btn btn-primary" />
-        <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
-    </div>
+    <button type="submit" class="btn btn-primary">Lưu phiếu</button>
+    <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
 </form>
 
 @section Scripts {
     <script>
         let idx = 1;
         function addRow() {
-            let tbody = document.querySelector('#detailTable tbody');
-            let tr = tbody.querySelector('tr').cloneNode(true);
-            tr.querySelectorAll('input').forEach(input => {
-                let name = input.getAttribute('name');
+            const tbody = document.querySelector('#detailTable tbody');
+            const tr = tbody.rows[0].cloneNode(true);
+            tr.querySelectorAll('input').forEach(i => {
+                const name = i.getAttribute('name');
                 if (name) {
-                    let newName = name.replace(/\d+/, idx);
-                    input.setAttribute('name', newName);
-                    if (input.type !== "button" && input.type !== "submit") input.value = '';
-                    if (input.hasAttribute('readonly')) input.value = '';
+                    i.setAttribute('name', name.replace(/\d+/, idx));
+                    i.value = name.endsWith('.Amount') ? '' : '0';
                 }
             });
-            tr.querySelector('button').onclick = function() { removeRow(this); };
-            tr.querySelector('button').classList.remove('btn-success');
-            tr.querySelector('button').classList.add('btn-danger');
-            tr.querySelector('button').innerText = '-';
+            tr.querySelector('button')
+              .className = 'btn btn-sm btn-danger'
+              , tr.querySelector('button').innerText = '-'
+              , tr.querySelector('button').onclick = e => e.target.closest('tr').remove();
             tbody.appendChild(tr);
             idx++;
         }
-
-        function removeRow(btn) {
-            let tr = btn.closest('tr');
-            let tbody = tr.parentNode;
-            if (tbody.children.length > 1) tbody.removeChild(tr);
-        }
-
-        function calcAmount(input) {
-            let tr = input.closest('tr');
-            let price = parseFloat(tr.querySelector('input[name$=".UnitPrice"]').value) || 0;
-            let qty = parseFloat(tr.querySelector('input[name$=".Quantity"]').value) || 0;
-            tr.querySelector('input[name$=".Amount"]').value = (price * qty).toLocaleString('vi-VN');
+        function calc(el) {
+            const tr = el.closest('tr');
+            const price = parseFloat(tr.querySelector('[name$=".UnitPrice"]').value) || 0;
+            const qty   = parseFloat(tr.querySelector('[name$=".Quantity"]').value)  || 0;
+            tr.querySelector('[name$=".Amount"]').value = (price * qty).toLocaleString('vi-VN');
         }
     </script>
 }

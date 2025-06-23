@@ -1,4 +1,5 @@
 ﻿@model SeafoodApp.Models.PurchaseOrder
+@using Microsoft.AspNetCore.Mvc.Rendering
 
 @{
     ViewData["Title"] = "Sửa phiếu mua nguyên liệu";
@@ -8,33 +9,109 @@
 
 <form asp-action="Edit" method="post">
     <input type="hidden" asp-for="Id" />
-    <div class="form-group">
-        <label asp-for="Code" class="control-label">Số phiếu</label>
-        <input asp-for="Code" class="form-control" />
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label asp-for="Code" class="form-label">Số phiếu</label>
+                <input asp-for="Code" class="form-control" />
+                <span asp-validation-for="Code" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="SupplierId" class="form-label">Nhà cung cấp</label>
+                <select asp-for="SupplierId" class="form-select" asp-items="ViewBag.SupplierList"></select>
+            </div>
+            <div class="mb-3">
+                <label asp-for="CreatedDate" class="form-label">Ngày lập</label>
+                <input asp-for="CreatedDate" class="form-control" type="date" />
+            </div>
+            <div class="mb-3">
+                <label asp-for="SupplyDate" class="form-label">Ngày cung cấp</label>
+                <input asp-for="SupplyDate" class="form-control" type="date" />
+            </div>
+            <div class="mb-3">
+                <label asp-for="ProductName" class="form-label">Sản phẩm</label>
+                <input asp-for="ProductName" class="form-control" />
+            </div>
+            <div class="mb-3">
+                <label asp-for="BatchNumber" class="form-label">Số lô</label>
+                <input asp-for="BatchNumber" class="form-control" />
+            </div>
+        </div>
     </div>
-    <div class="form-group">
-        <label asp-for="SupplierId" class="control-label">Nhà cung cấp</label>
-        <select asp-for="SupplierId" class="form-control" asp-items="ViewBag.SupplierList"></select>
-    </div>
-    <div class="form-group">
-        <label asp-for="CreatedDate" class="control-label">Ngày lập</label>
-        <input asp-for="CreatedDate" class="form-control" type="date" />
-    </div>
-    <div class="form-group">
-        <label asp-for="SupplyDate" class="control-label">Ngày cung cấp</label>
-        <input asp-for="SupplyDate" class="form-control" type="date" />
-    </div>
-    <div class="form-group">
-        <label asp-for="ProductName" class="control-label">Sản phẩm</label>
-        <input asp-for="ProductName" class="form-control" />
-    </div>
-    <div class="form-group">
-        <label asp-for="BatchNumber" class="control-label">Số lô</label>
-        <input asp-for="BatchNumber" class="form-control" />
-    </div>
-    @* Chưa hỗ trợ sửa chi tiết động, chỉ sửa thông tin chung *@
-    <div class="form-group mt-2">
-        <input type="submit" value="Lưu thay đổi" class="btn btn-primary" />
-        <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
-    </div>
+
+    <hr />
+    <h4>Chi tiết</h4>
+    <table class="table table-bordered" id="detailTable">
+        <thead>
+            <tr>
+                <th>Size</th>
+                <th>Giá</th>
+                <th>Số lượng</th>
+                <th>Thành tiền</th>
+                <th style="width: 40px;"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < Model.Details.Count; i++)
+            {
+                <tr>
+                    <td>
+                        <input name="Details[@i].Size" class="form-control"
+                               value="@Model.Details.ElementAt(i).Size" />
+                    </td>
+                    <td>
+                        <input name="Details[@i].UnitPrice" type="number" class="form-control"
+                               value="@Model.Details.ElementAt(i).UnitPrice" oninput="calc(this)" />
+                    </td>
+                    <td>
+                        <input name="Details[@i].Quantity" type="number" class="form-control"
+                               value="@Model.Details.ElementAt(i).Quantity" oninput="calc(this)" />
+                    </td>
+                    <td>
+                        <input name="Details[@i].Amount" class="form-control" readonly
+                               value="@( (Model.Details.ElementAt(i).UnitPrice * Model.Details.ElementAt(i).Quantity).ToString("N0") )" />
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-sm @(i == 0 ? "btn-success" : "btn-danger")"
+                                onclick="@(i==0 ? "addRow()" : "this.closest('tr').remove()")">
+                            @(i == 0 ? "+" : "-")
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+    <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
 </form>
+
+@section Scripts {
+    <script>
+        let idx = @Model.Details.Count;
+        function addRow() {
+            const tbody = document.querySelector('#detailTable tbody');
+            const template = tbody.rows[0].cloneNode(true);
+            template.querySelectorAll('input').forEach(i => {
+                const name = i.getAttribute('name');
+                if (name) {
+                    i.setAttribute('name', name.replace(/\d+/, idx));
+                    i.value = name.endsWith('.Amount') ? '' : '0';
+                }
+            });
+            const btn = template.querySelector('button');
+            btn.className = 'btn btn-sm btn-danger';
+            btn.innerText = '-';
+            btn.onclick = e => e.target.closest('tr').remove();
+            tbody.appendChild(template);
+            idx++;
+        }
+        function calc(el) {
+            const tr = el.closest('tr');
+            const price = parseFloat(tr.querySelector('[name$=".UnitPrice"]').value) || 0;
+            const qty   = parseFloat(tr.querySelector('[name$=".Quantity"]').value)  || 0;
+            tr.querySelector('[name$=".Amount"]').value = (price * qty).toLocaleString('vi-VN');
+        }
+    </script>
+}

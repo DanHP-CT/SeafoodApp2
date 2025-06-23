@@ -5,11 +5,15 @@
 }
 
 <h2>@ViewData["Title"]</h2>
-<a class="btn btn-primary mb-2" asp-action="Create">Tạo phiếu mới</a>
-<table class="table table-bordered">
+
+<p>
+    <a asp-action="Create">Tạo mới</a>
+</p>
+
+<table class="table">
     <thead>
         <tr>
-            <th>No.</th>
+            <th>Số phiếu</th>
             <th>Nhà cung cấp</th>
             <th>Ngày lập</th>
             <th>Ngày cung cấp</th>
@@ -25,9 +29,9 @@
                 <td>@item.CreatedDate.ToString("dd/MM/yyyy")</td>
                 <td>@item.SupplyDate.ToString("dd/MM/yyyy")</td>
                 <td>
-                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info btn-sm">Chi tiết</a>
-                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm">Sửa</a>
-                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc chắn muốn xóa?')">Xóa</a>
+                    <a asp-action="Edit" asp-route-id="@item.Id">Sửa</a> |
+                    <a asp-action="Details" asp-route-id="@item.Id">Chi tiết</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">Xóa</a>
                 </td>
             </tr>
         }

@@ -1,0 +1,105 @@
+﻿@model SeafoodApp.Models.ProductionOrder
+
+@{
+    ViewData["Title"] = "Tạo lệnh sản xuất";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+@Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+<form asp-action="Create" method="post">
+    <div class="form-group">
+        <label asp-for="Code" class="control-label">Số lệnh SX</label>
+        <input asp-for="Code" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="ContractNumber" class="control-label">Số hợp đồng</label>
+        <input asp-for="ContractNumber" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="CustomerName" class="control-label">Tên khách hàng</label>
+        <input asp-for="CustomerName" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="PackagingSupplyDate" class="control-label">Ngày cung cấp bao bì</label>
+        <input asp-for="PackagingSupplyDate" class="form-control" type="date" />
+    </div>
+    <div class="form-group">
+        <label asp-for="CompletionDate" class="control-label">Ngày hoàn thành</label>
+        <input asp-for="CompletionDate" class="form-control" type="date" />
+    </div>
+    <div class="form-group form-check mt-2">
+        <input asp-for="IsCompleted" class="form-check-input" />
+        <label asp-for="IsCompleted" class="form-check-label">Hoàn thành</label>
+    </div>
+
+    <hr />
+    <h4>Chi tiết</h4>
+    <table class="table" id="detailTable">
+        <thead>
+            <tr>
+                <th>Sản phẩm</th>
+                <th>Size</th>
+                <th>Đóng gói</th>
+                <th>Số lượng</th>
+                <th>Ghi chú</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <input type="hidden" name="Details[0].ProductionOrderId" value="0" />
+                    <input name="Details[0].ProductName" class="form-control" />
+                </td>
+                <td><input name="Details[0].Size" class="form-control" /></td>
+                <td><input name="Details[0].Packaging" class="form-control" /></td>
+                <td><input name="Details[0].Quantity" type="number" class="form-control" /></td>
+                <td><input name="Details[0].Note" class="form-control" /></td>
+                <td>
+                    <button type="button" class="btn btn-success" onclick="addRow()">+</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="form-group mt-2">
+        <input type="submit" value="Lưu lệnh sản xuất" class="btn btn-primary" />
+        <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+    </div>
+</form>
+
+@section Scripts {
+    <script>
+        let idx = 1;
+        function addRow() {
+            const tbody = document.querySelector('#detailTable tbody');
+            const tr = tbody.querySelector('tr').cloneNode(true);
+            tr.querySelectorAll('input').forEach(input => {
+                const name = input.getAttribute('name');
+                if (!name) return;
+                const newName = name.replace(/\d+/, idx);
+                input.setAttribute('name', newName);
+                // ProductionOrderId luôn là 0 khi tạo mới
+                if (name.endsWith('.ProductionOrderId')) {
+                    input.value = '0';
+                } else {
+                    input.value = '';
+                }
+            });
+            const btn = tr.querySelector('button');
+            btn.onclick = () => removeRow(btn);
+            btn.classList.replace('btn-success', 'btn-danger');
+            btn.innerText = '-';
+            tbody.appendChild(tr);
+            idx++;
+        }
+
+        function removeRow(btn) {
+            const tr = btn.closest('tr');
+            const tbody = tr.parentNode;
+            if (tbody.children.length > 1) tbody.removeChild(tr);
+        }
+    </script>
+}

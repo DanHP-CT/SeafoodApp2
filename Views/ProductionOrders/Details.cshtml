@@ -1,0 +1,76 @@
+﻿@model SeafoodApp.Models.ProductionOrder
+
+@{
+    ViewData["Title"] = "Chi tiết lệnh sản xuất";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <dl class="row">
+            <dt class="col-sm-4">Số lệnh SX</dt>
+            <dd class="col-sm-8">@Model.Code</dd>
+
+            <dt class="col-sm-4">Số hợp đồng</dt>
+            <dd class="col-sm-8">@Model.ContractNumber</dd>
+
+            <dt class="col-sm-4">Tên khách hàng</dt>
+            <dd class="col-sm-8">@Model.CustomerName</dd>
+
+            <dt class="col-sm-4">Ngày cung cấp bao bì</dt>
+            <dd class="col-sm-8">
+                @Model.PackagingSupplyDate?.ToString("dd/MM/yyyy")
+            </dd>
+
+            <dt class="col-sm-4">Ngày hoàn thành</dt>
+            <dd class="col-sm-8">
+                @Model.CompletionDate?.ToString("dd/MM/yyyy")
+            </dd>
+
+            <dt class="col-sm-4">Trạng thái</dt>
+            <dd class="col-sm-8">
+                @(Model.IsCompleted ? "Hoàn thành" : "Chưa hoàn thành")
+            </dd>
+        </dl>
+    </div>
+</div>
+
+@if (Model.Details != null && Model.Details.Any())
+{
+    <h4>Chi tiết sản phẩm</h4>
+    <table class="table table-bordered">
+        <thead class="thead-light">
+            <tr>
+                <th>Sản phẩm</th>
+                <th>Size</th>
+                <th>Đóng gói</th>
+                <th>Số lượng</th>
+                <th>Ghi chú</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var d in Model.Details)
+            {
+                <tr>
+                    <td>@d.ProductName</td>
+                    <td>@d.Size</td>
+                    <td>@d.Packaging</td>
+                    <td>@d.Quantity</td>
+                    <td>@(string.IsNullOrWhiteSpace(d.Note) ? "-" : d.Note)</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <div class="alert alert-info">
+        Chưa có chi tiết sản phẩm nào.
+    </div>
+}
+
+<p>
+    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Sửa</a>
+    <a asp-action="Index" class="btn btn-secondary">Quay lại danh sách</a>
+</p>

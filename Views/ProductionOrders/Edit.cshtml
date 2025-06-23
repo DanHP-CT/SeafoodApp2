@@ -1,0 +1,81 @@
+﻿@model SeafoodApp.Models.ProductionOrder
+
+@{
+    ViewData["Title"] = "Sửa lệnh sản xuất";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<form asp-action="Edit" method="post">
+    <input type="hidden" asp-for="Id" />
+
+    <!-- … Các trường header giống trước … -->
+
+    <hr />
+    <h4>Chi tiết</h4>
+    <table class="table table-bordered" id="detailTable">
+        <thead>
+            <tr>
+                <th>Sản phẩm</th>
+                <th>Size</th>
+                <th>Đóng gói</th>
+                <th>Số lượng</th>
+                <th>Ghi chú</th>
+                <th style="width:40px"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < Model.Details.Count; i++)
+            {
+                <tr>
+                    <td><input name="Details[@i].ProductName" class="form-control" value="@Model.Details.ElementAt(i).ProductName" /></td>
+                    <td><input name="Details[@i].Size" class="form-control" value="@Model.Details.ElementAt(i).Size" /></td>
+                    <td><input name="Details[@i].Packaging" class="form-control" value="@Model.Details.ElementAt(i).Packaging" /></td>
+                    <td><input name="Details[@i].Quantity" type="number" class="form-control" value="@Model.Details.ElementAt(i).Quantity" /></td>
+                    <td><input name="Details[@i].Note" class="form-control" value="@Model.Details.ElementAt(i).Note" /></td>
+                    <td>
+                        @if (i == 0)
+                        {
+                            <button type="button" class="btn btn-sm btn-success" onclick="addRow()">+</button>
+                        }
+                        else
+                        {
+                            <button type="button" class="btn btn-sm btn-danger" onclick="this.closest('tr').remove()">-</button>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+    <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+</form>
+
+@section Scripts {
+    <script>
+        // idx khởi tạo bằng số dòng hiện có
+        let idx = @Model.Details.Count;
+
+        function addRow() {
+            const tbody = document.querySelector('#detailTable tbody');
+            const template = tbody.rows[0].cloneNode(true);
+
+            // Cập nhật name và xóa giá trị cũ
+            template.querySelectorAll('input').forEach(i => {
+                const name = i.getAttribute('name').replace(/\d+/, idx);
+                i.setAttribute('name', name);
+                i.value = '';
+            });
+
+            // Nút chuyển thành '-'
+            const btn = template.querySelector('button');
+            btn.className = 'btn btn-sm btn-danger';
+            btn.innerText = '-';
+            btn.onclick = () => btn.closest('tr').remove();
+
+            tbody.appendChild(template);
+            idx++;
+        }
+    </script>
+}

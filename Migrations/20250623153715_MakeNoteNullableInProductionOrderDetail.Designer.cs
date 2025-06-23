@@ -11,8 +11,8 @@ using SeafoodApp.Data;
 namespace SeafoodApp.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250623134846_ReAddProductionOrder")]
-    partial class ReAddProductionOrder
+    [Migration("20250623153715_MakeNoteNullableInProductionOrderDetail")]
+    partial class MakeNoteNullableInProductionOrderDetail
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -256,7 +256,6 @@ namespace SeafoodApp.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Note")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Packaging")
