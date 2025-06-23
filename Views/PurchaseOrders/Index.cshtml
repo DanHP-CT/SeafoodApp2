@@ -1,0 +1,35 @@
+﻿@model IEnumerable<SeafoodApp.Models.PurchaseOrder>
+
+@{
+    ViewData["Title"] = "Danh sách phiếu mua nguyên liệu";
+}
+
+<h2>@ViewData["Title"]</h2>
+<a class="btn btn-primary mb-2" asp-action="Create">Tạo phiếu mới</a>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>No.</th>
+            <th>Nhà cung cấp</th>
+            <th>Ngày lập</th>
+            <th>Ngày cung cấp</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Code</td>
+                <td>@item.Supplier?.Name</td>
+                <td>@item.CreatedDate.ToString("dd/MM/yyyy")</td>
+                <td>@item.SupplyDate.ToString("dd/MM/yyyy")</td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info btn-sm">Chi tiết</a>
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm">Sửa</a>
+                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc chắn muốn xóa?')">Xóa</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,31 @@
+﻿@model SeafoodApp.Models.PurchaseOrder
+
+@{
+    ViewData["Title"] = "Xóa phiếu mua nguyên liệu";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<h4>Bạn có chắc chắn muốn xóa phiếu này?</h4>
+<div>
+    <dl class="row">
+        <dt class="col-sm-3">Số phiếu</dt>
+        <dd class="col-sm-9">@Model.Code</dd>
+        <dt class="col-sm-3">Nhà cung cấp</dt>
+        <dd class="col-sm-9">@Model.Supplier?.Name</dd>
+        <dt class="col-sm-3">Ngày lập</dt>
+        <dd class="col-sm-9">@Model.CreatedDate.ToString("dd/MM/yyyy")</dd>
+        <dt class="col-sm-3">Ngày cung cấp</dt>
+        <dd class="col-sm-9">@Model.SupplyDate.ToString("dd/MM/yyyy")</dd>
+        <dt class="col-sm-3">Sản phẩm</dt>
+        <dd class="col-sm-9">@Model.ProductName</dd>
+        <dt class="col-sm-3">Số lô</dt>
+        <dd class="col-sm-9">@Model.BatchNumber</dd>
+    </dl>
+</div>
+
+<form asp-action="Delete" method="post">
+    <input type="hidden" asp-for="Id" />
+    <input type="submit" value="Xóa" class="btn btn-danger" />
+    <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+</form>

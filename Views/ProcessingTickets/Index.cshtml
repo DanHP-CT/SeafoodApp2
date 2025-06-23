@@ -1,0 +1,83 @@
+﻿@model IEnumerable<SeafoodApp.Models.ProcessingTicket>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Code)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ProcessingDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ProductionOrder)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ProcessStep)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Department)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.WorkerCount)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DurationHours)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IsCompleted)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Note)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Code)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ProcessingDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ProductionOrder.Id)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ProcessStep.Id)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Department)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.WorkerCount)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DurationHours)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IsCompleted)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Note)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

@@ -1,0 +1,54 @@
+﻿@model SeafoodApp.Models.PurchaseOrder
+
+@{
+    ViewData["Title"] = "Chi tiết phiếu mua nguyên liệu";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<div class="mb-3">
+    <dl class="row">
+        <dt class="col-sm-3">Số phiếu</dt>
+        <dd class="col-sm-9">@Model.Code</dd>
+        <dt class="col-sm-3">Nhà cung cấp</dt>
+        <dd class="col-sm-9">@Model.Supplier?.Name</dd>
+        <dt class="col-sm-3">Ngày lập</dt>
+        <dd class="col-sm-9">@Model.CreatedDate.ToString("dd/MM/yyyy")</dd>
+        <dt class="col-sm-3">Ngày cung cấp</dt>
+        <dd class="col-sm-9">@Model.SupplyDate.ToString("dd/MM/yyyy")</dd>
+        <dt class="col-sm-3">Sản phẩm</dt>
+        <dd class="col-sm-9">@Model.ProductName</dd>
+        <dt class="col-sm-3">Số lô</dt>
+        <dd class="col-sm-9">@Model.BatchNumber</dd>
+    </dl>
+</div>
+
+@if (Model.Details != null && Model.Details.Any())
+{
+    <h4>Chi tiết</h4>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Size</th>
+                <th>Giá</th>
+                <th>Số lượng</th>
+                <th>Thành tiền</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var d in Model.Details)
+            {
+                <tr>
+                    <td>@d.Size</td>
+                    <td>@d.UnitPrice.ToString("N0")</td>
+                    <td>@d.Quantity</td>
+                    <td>@(d.Amount.ToString("N0"))</td>
+                    @* Nếu chưa có property Amount, dùng: <td>@((d.UnitPrice * d.Quantity).ToString("N0"))</td> *@
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Sửa</a>
+<a asp-action="Index" class="btn btn-secondary">Quay lại</a>
