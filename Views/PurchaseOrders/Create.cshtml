@@ -1,95 +1,95 @@
 ﻿@model SeafoodApp.Models.PurchaseOrder
-@using Microsoft.AspNetCore.Mvc.Rendering
-
 @{
-    ViewData["Title"] = "Tạo phiếu mua nguyên liệu";
+    ViewData["Title"] = "Tạo phiếu mua";
 }
 
 <h2>@ViewData["Title"]</h2>
 
 <form asp-action="Create" method="post">
-    <div class="row">
-        <div class="col-md-6">
-            <div class="mb-3">
-                <label asp-for="Code" class="form-label">Số phiếu</label>
-                <input asp-for="Code" class="form-control" />
-                <span asp-validation-for="Code" class="text-danger"></span>
-            </div>
-            <div class="mb-3">
-                <label asp-for="SupplierId" class="form-label">Nhà cung cấp</label>
-                <select asp-for="SupplierId" class="form-select" asp-items="ViewBag.SupplierList"></select>
-            </div>
-            <div class="mb-3">
-                <label asp-for="CreatedDate" class="form-label">Ngày lập</label>
-                <input asp-for="CreatedDate" class="form-control" type="date" />
-            </div>
-            <div class="mb-3">
-                <label asp-for="SupplyDate" class="form-label">Ngày cung cấp</label>
-                <input asp-for="SupplyDate" class="form-control" type="date" />
-            </div>
-            <div class="mb-3">
-                <label asp-for="ProductName" class="form-label">Sản phẩm</label>
-                <input asp-for="ProductName" class="form-control" />
-            </div>
-            <div class="mb-3">
-                <label asp-for="BatchNumber" class="form-label">Số lô</label>
-                <input asp-for="BatchNumber" class="form-control" />
-            </div>
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <label asp-for="SupplierId">Nhà cung cấp</label>
+            <select asp-for="SupplierId" asp-items="ViewBag.Suppliers" class="form-control"></select>
+        </div>
+        <div class="col-md-4">
+            <label asp-for="CreatedDate">Ngày lập</label>
+            <input asp-for="CreatedDate" class="form-control" type="date" />
+        </div>
+        <div class="col-md-4">
+            <label asp-for="SupplyDate">Ngày cung cấp</label>
+            <input asp-for="SupplyDate" class="form-control" type="date" />
         </div>
     </div>
 
-    <hr />
     <h4>Chi tiết</h4>
-    <table class="table table-bordered" id="detailTable">
+    <table class="table">
         <thead>
             <tr>
-                <th>Size</th>
+                <th>Sản phẩm</th>
+                <th>Số lô</th>
                 <th>Giá</th>
                 <th>Số lượng</th>
-                <th>Thành tiền</th>
-                <th style="width: 40px;"></th>
+                <th></th>
             </tr>
         </thead>
-        <tbody>
-            <tr>
-                <td><input name="Details[0].Size" class="form-control" /></td>
-                <td><input name="Details[0].UnitPrice" class="form-control" type="number" oninput="calc(this)" /></td>
-                <td><input name="Details[0].Quantity" class="form-control" type="number" oninput="calc(this)" /></td>
-                <td><input name="Details[0].Amount" class="form-control" readonly /></td>
-                <td><button type="button" class="btn btn-sm btn-success" onclick="addRow()">+</button></td>
-            </tr>
+        <tbody id="detail-body">
+            @for (int i = 0; i < Model.Details.Count; i++)
+            {
+                <tr>
+                    <td><input asp-for="Details[@i].ProductName" class="form-control" /></td>
+                    <td><input asp-for="Details[@i].BatchNumber" class="form-control" /></td>
+                    <td>
+                        <input asp-for="Details[@i].Price"
+                               class="form-control"
+                               type="number"
+                               step="any" />
+                    </td>
+                    <td>
+                        <input asp-for="Details[@i].Quantity"
+                               class="form-control"
+                               type="number"
+                               step="any" />
+                    </td>
+                    <td>
+                        <button type="button"
+                                class="btn btn-danger"
+                                onclick="removeRow(this)">
+                            –
+                        </button>
+                    </td>
+                </tr>
+            }
         </tbody>
     </table>
 
-    <button type="submit" class="btn btn-primary">Lưu phiếu</button>
-    <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+    <button type="button"
+            class="btn btn-secondary mb-3"
+            onclick="addRow()">
+        Thêm dòng
+    </button>
+
+    <div>
+        <button type="submit" class="btn btn-primary">Lưu</button>
+        <a asp-action="Index" class="btn btn-link">Quay lại</a>
+    </div>
 </form>
 
 @section Scripts {
     <script>
-        let idx = 1;
-        function addRow() {
-            const tbody = document.querySelector('#detailTable tbody');
-            const tr = tbody.rows[0].cloneNode(true);
-            tr.querySelectorAll('input').forEach(i => {
-                const name = i.getAttribute('name');
-                if (name) {
-                    i.setAttribute('name', name.replace(/\d+/, idx));
-                    i.value = name.endsWith('.Amount') ? '' : '0';
+                function addRow() {
+                    var idx = document.querySelectorAll('#detail-body tr').length;
+                    var tmpl = `
+        <tr>
+          <td><input name="Details[${idx}].ProductName" class="form-control" /></td>
+          <td><input name="Details[${idx}].BatchNumber" class="form-control" /></td>
+          <td><input name="Details[${idx}].Price" type="number" step="any" class="form-control" /></td>
+          <td><input name="Details[${idx}].Quantity" type="number" step="any" class="form-control" /></td>
+          <td><button type="button" class="btn btn-danger" onclick="removeRow(this)">–</button></td>
+        </tr>`;
+                    document.getElementById('detail-body').insertAdjacentHTML('beforeend', tmpl);
                 }
-            });
-            tr.querySelector('button')
-              .className = 'btn btn-sm btn-danger'
-              , tr.querySelector('button').innerText = '-'
-              , tr.querySelector('button').onclick = e => e.target.closest('tr').remove();
-            tbody.appendChild(tr);
-            idx++;
-        }
-        function calc(el) {
-            const tr = el.closest('tr');
-            const price = parseFloat(tr.querySelector('[name$=".UnitPrice"]').value) || 0;
-            const qty   = parseFloat(tr.querySelector('[name$=".Quantity"]').value)  || 0;
-            tr.querySelector('[name$=".Amount"]').value = (price * qty).toLocaleString('vi-VN');
-        }
+                function removeRow(btn) {
+                    btn.closest('tr').remove();
+                }
     </script>
 }

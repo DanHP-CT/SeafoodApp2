@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SeafoodApp.Data;
 
@@ -10,9 +11,11 @@ using SeafoodApp.Data;
 namespace SeafoodApp.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250624034332_UpdateDbAfterRemoveProcessingItem")]
+    partial class UpdateDbAfterRemoveProcessingItem
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.6");
@@ -63,6 +66,47 @@ namespace SeafoodApp.Migrations
                     b.ToTable("ColdInventories");
                 });
 
+            modelBuilder.Entity("SeafoodApp.Models.InventoryHistory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ActionType")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("LotCode")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Note")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ProductName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ProductType")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Size")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("InventoryHistories");
+                });
+
             modelBuilder.Entity("SeafoodApp.Models.ProcessStep", b =>
                 {
                     b.Property<int>("Id")
@@ -105,47 +149,49 @@ namespace SeafoodApp.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Department")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("DurationHours")
+                    b.Property<int?>("DurationHours")
                         .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsCompleted")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Note")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("ProcessStepId")
+                    b.Property<int?>("ProcessStepId")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("ProcessingDate")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("ProductionOrderId")
+                    b.Property<int?>("ProductionOrderId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("WorkerCount")
+                    b.Property<int?>("WorkerCount")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ProcessStepId");
 
+                    b.HasIndex("ProductionOrderId");
+
                     b.ToTable("ProcessingTickets");
                 });
 
-            modelBuilder.Entity("SeafoodApp.Models.ProcessingTicketInputDetail", b =>
+            modelBuilder.Entity("SeafoodApp.Models.ProcessingTicketDetail", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("BatchNumber")
-                        .IsRequired()
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsInput")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("MaterialName")
                         .IsRequired()
@@ -157,38 +203,14 @@ namespace SeafoodApp.Migrations
                     b.Property<int>("Quantity")
                         .HasColumnType("INTEGER");
 
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProcessingTicketId");
-
-                    b.ToTable("ProcessingTicketInputDetails");
-                });
-
-            modelBuilder.Entity("SeafoodApp.Models.ProcessingTicketOutputDetail", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("BatchNumber")
-                        .IsRequired()
+                    b.Property<string>("Size")
                         .HasColumnType("TEXT");
-
-                    b.Property<string>("MaterialName")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("ProcessingTicketId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ProcessingTicketId");
 
-                    b.ToTable("ProcessingTicketOutputDetails");
+                    b.ToTable("ProcessingTicketDetails");
                 });
 
             modelBuilder.Entity("SeafoodApp.Models.ProductionOrder", b =>
@@ -263,6 +285,10 @@ namespace SeafoodApp.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("BatchNumber")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Code")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -270,17 +296,15 @@ namespace SeafoodApp.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ProductName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("SupplierId")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("SupplyDate")
                         .HasColumnType("TEXT");
-
-                    b.Property<decimal>("TotalAmount")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("TotalQuantity")
-                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
@@ -295,21 +319,17 @@ namespace SeafoodApp.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("BatchNumber")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ProductName")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
                     b.Property<int>("PurchaseOrderId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<decimal>("Quantity")
+                    b.Property<int>("Quantity")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Size")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("UnitPrice")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -370,28 +390,23 @@ namespace SeafoodApp.Migrations
 
             modelBuilder.Entity("SeafoodApp.Models.ProcessingTicket", b =>
                 {
-                    b.HasOne("SeafoodApp.Models.ProcessStep", null)
+                    b.HasOne("SeafoodApp.Models.ProcessStep", "ProcessStep")
                         .WithMany("ProcessingTickets")
-                        .HasForeignKey("ProcessStepId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ProcessStepId");
+
+                    b.HasOne("SeafoodApp.Models.ProductionOrder", "ProductionOrder")
+                        .WithMany()
+                        .HasForeignKey("ProductionOrderId");
+
+                    b.Navigation("ProcessStep");
+
+                    b.Navigation("ProductionOrder");
                 });
 
-            modelBuilder.Entity("SeafoodApp.Models.ProcessingTicketInputDetail", b =>
+            modelBuilder.Entity("SeafoodApp.Models.ProcessingTicketDetail", b =>
                 {
                     b.HasOne("SeafoodApp.Models.ProcessingTicket", "ProcessingTicket")
-                        .WithMany("InputDetails")
-                        .HasForeignKey("ProcessingTicketId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ProcessingTicket");
-                });
-
-            modelBuilder.Entity("SeafoodApp.Models.ProcessingTicketOutputDetail", b =>
-                {
-                    b.HasOne("SeafoodApp.Models.ProcessingTicket", "ProcessingTicket")
-                        .WithMany("OutputDetails")
+                        .WithMany("Details")
                         .HasForeignKey("ProcessingTicketId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -439,9 +454,7 @@ namespace SeafoodApp.Migrations
 
             modelBuilder.Entity("SeafoodApp.Models.ProcessingTicket", b =>
                 {
-                    b.Navigation("InputDetails");
-
-                    b.Navigation("OutputDetails");
+                    b.Navigation("Details");
                 });
 
             modelBuilder.Entity("SeafoodApp.Models.ProductionOrder", b =>

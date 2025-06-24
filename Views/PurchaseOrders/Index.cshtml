@@ -1,22 +1,21 @@
 ﻿@model IEnumerable<SeafoodApp.Models.PurchaseOrder>
-
 @{
     ViewData["Title"] = "Danh sách phiếu mua nguyên liệu";
 }
 
 <h2>@ViewData["Title"]</h2>
-
 <p>
-    <a asp-action="Create">Tạo mới</a>
+    <a asp-action="Create" class="btn btn-primary">Tạo phiếu mới</a>
 </p>
-
-<table class="table">
+<table class="table table-striped">
     <thead>
         <tr>
             <th>Số phiếu</th>
             <th>Nhà cung cấp</th>
             <th>Ngày lập</th>
             <th>Ngày cung cấp</th>
+            <th>Tổng SL</th>
+            <th>Tổng tiền</th>
             <th></th>
         </tr>
     </thead>
@@ -26,8 +25,10 @@
             <tr>
                 <td>@item.Code</td>
                 <td>@item.Supplier?.Name</td>
-                <td>@item.CreatedDate.ToString("dd/MM/yyyy")</td>
-                <td>@item.SupplyDate.ToString("dd/MM/yyyy")</td>
+                <td>@item.CreatedDate:dd/MM/yyyy</td>
+                <td>@item.SupplyDate:dd/MM/yyyy</td>
+                <td>@item.TotalQuantity:N0</td>
+                <td>@item.TotalAmount:N0</td>
                 <td>
                     <a asp-action="Edit" asp-route-id="@item.Id">Sửa</a> |
                     <a asp-action="Details" asp-route-id="@item.Id">Chi tiết</a> |

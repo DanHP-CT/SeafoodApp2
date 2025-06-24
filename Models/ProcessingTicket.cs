@@ -1,22 +1,40 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace SeafoodApp.Models
 {
     public class ProcessingTicket
     {
         public int Id { get; set; }
+
+        [Display(Name = "Số phiếu")]
         public string Code { get; set; } = string.Empty;
-        public DateTime ProcessingDate { get; set; }
+
+        [Display(Name = "Ngày chế biến")]
+        public DateTime ProcessingDate { get; set; } = DateTime.Now;
+
+        [Display(Name = "Lệnh sản xuất")]
         public int ProductionOrderId { get; set; }
-        public ProductionOrder? ProductionOrder { get; set; }
+
+        [Display(Name = "Công đoạn")]
         public int ProcessStepId { get; set; }
-        public ProcessStep? ProcessStep { get; set; }
+
+        [Display(Name = "Bộ phận")]
         public string Department { get; set; } = string.Empty;
+
+        [Display(Name = "Số nhân công")]
         public int WorkerCount { get; set; }
-        public double DurationHours { get; set; }
-        public ICollection<ProcessingItem> ProcessingItems { get; set; } = new List<ProcessingItem>();
-        public bool IsCompleted { get; set; }
+
+        [Display(Name = "Thời gian (giờ)")]
+        public int DurationHours { get; set; }
+
+        [Display(Name = "Ghi chú")]
         public string Note { get; set; } = string.Empty;
+
+        [Display(Name = "Hoàn thành")]
+        public bool IsCompleted { get; set; }
+
+        // Navigation
+        public ICollection<ProcessingTicketInputDetail> InputDetails { get; set; } = new List<ProcessingTicketInputDetail>();
+        public ICollection<ProcessingTicketOutputDetail> OutputDetails { get; set; } = new List<ProcessingTicketOutputDetail>();
     }
 }

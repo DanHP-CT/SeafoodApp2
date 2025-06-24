@@ -1,72 +1,51 @@
 ﻿@model SeafoodApp.Models.ProcessingTicket
-
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = $"Chi tiết phiếu #{Model.Code}";
 }
+<h2>@ViewData["Title"]</h2>
 
-<h1>Details</h1>
+<p>
+    <strong>Ngày:</strong> @Model.ProcessingDate.ToString("dd/MM/yyyy HH:mm")<br />
+    <strong>LSX:</strong> @Model.ProductionOrderId<br />
+    <strong>Công đoạn:</strong> @Model.ProcessStepId<br />
+    <strong>Bộ phận:</strong> @Model.Department<br />
+    <strong>Nhân công:</strong> @Model.WorkerCount<br />
+    <strong>Thời gian:</strong> @Model.DurationHours giờ<br />
+    <strong>Ghi chú:</strong> @Model.Note
+</p>
 
-<div>
-    <h4>ProcessingTicket</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Code)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Code)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ProcessingDate)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ProcessingDate)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ProductionOrder)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ProductionOrder.Id)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ProcessStep)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ProcessStep.Id)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Department)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Department)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.WorkerCount)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.WorkerCount)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.DurationHours)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.DurationHours)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.IsCompleted)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.IsCompleted)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Note)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Note)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
+<hr />
+<h4>Đầu vào</h4>
+<table class="table">
+    <thead><tr><th>Tên</th><th>SL</th><th>Lô</th></tr></thead>
+    <tbody>
+        @foreach (var d in Model.InputDetails)
+        {
+            <tr>
+                <td>@d.MaterialName</td>
+                <td>@d.Quantity</td>
+                <td>@d.BatchNumber</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<h4>Đầu ra</h4>
+<table class="table">
+    <thead><tr><th>Tên</th><th>SL</th><th>Lô</th></tr></thead>
+    <tbody>
+        @foreach (var d in Model.OutputDetails)
+        {
+            <tr>
+                <td>@d.MaterialName</td>
+                <td>@d.Quantity</td>
+                <td>@d.BatchNumber</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<p>
+    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Sửa</a>
+    <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+</p>

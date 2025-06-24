@@ -1,83 +1,37 @@
 ﻿@model IEnumerable<SeafoodApp.Models.ProcessingTicket>
-
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Danh sách phiếu chế biến";
 }
-
-<h1>Index</h1>
-
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
+<h2>@ViewData["Title"]</h2>
+<a asp-action="Create" class="btn btn-primary mb-3">Tạo phiếu chế biến</a>
+<table class="table table-striped">
     <thead>
         <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Code)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ProcessingDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ProductionOrder)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ProcessStep)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Department)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.WorkerCount)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DurationHours)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IsCompleted)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Note)
-            </th>
+            <th>Số phiếu</th>
+            <th>Ngày</th>
+            <th>LSX</th>
+            <th>Công đoạn</th>
+            <th>Bộ phận</th>
+            <th>Nhân công</th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Code)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ProcessingDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ProductionOrder.Id)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ProcessStep.Id)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Department)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.WorkerCount)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DurationHours)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IsCompleted)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Note)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var x in Model)
+        {
+            <tr>
+                <td>@x.Code</td>
+                <td>@x.ProcessingDate.ToString("dd/MM/yyyy HH:mm")</td>
+                <td>@x.ProductionOrderId</td>
+                <td>@x.ProcessStepId</td>
+                <td>@x.Department</td>
+                <td>@x.WorkerCount</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@x.Id" class="btn btn-sm btn-warning">Sửa</a>
+                    <a asp-action="Details" asp-route-id="@x.Id" class="btn btn-sm btn-info">Chi tiết</a>
+                    <a asp-action="Delete" asp-route-id="@x.Id" class="btn btn-sm btn-danger">Xóa</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SeafoodApp.Data;
 using SeafoodApp.Models;
@@ -13,158 +8,125 @@ namespace SeafoodApp.Controllers
     public class ProcessingTicketsController : Controller
     {
         private readonly AppDbContext _context;
-
         public ProcessingTicketsController(AppDbContext context)
-        {
-            _context = context;
-        }
+            => _context = context;
 
-        // GET: ProcessingTickets
+        // GET: /ProcessingTickets
         public async Task<IActionResult> Index()
         {
-            var appDbContext = _context.ProcessingTickets.Include(p => p.ProcessStep).Include(p => p.ProductionOrder);
-            return View(await appDbContext.ToListAsync());
+            var list = await _context.ProcessingTickets
+                .OrderByDescending(x => x.ProcessingDate)
+                .ToListAsync();
+            return View(list);
         }
 
-        // GET: ProcessingTickets/Details/5
+        // GET: /ProcessingTickets/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var processingTicket = await _context.ProcessingTickets
-                .Include(p => p.ProcessStep)
-                .Include(p => p.ProductionOrder)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (processingTicket == null)
-            {
-                return NotFound();
-            }
-
-            return View(processingTicket);
+            if (id == null) return NotFound();
+            var ticket = await _context.ProcessingTickets
+                .Include(x => x.InputDetails)
+                .Include(x => x.OutputDetails)
+                .FirstOrDefaultAsync(x => x.Id == id);
+            if (ticket == null) return NotFound();
+            return View(ticket);
         }
 
-        // GET: ProcessingTickets/Create
+        // GET: /ProcessingTickets/Create
         public IActionResult Create()
         {
-            ViewData["ProcessStepId"] = new SelectList(_context.ProcessSteps, "Id", "Id");
-            ViewData["ProductionOrderId"] = new SelectList(_context.ProductionOrders, "Id", "Id");
-            return View();
+            return View(new ProcessingTicket());
         }
 
-        // POST: ProcessingTickets/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Code,ProcessingDate,ProductionOrderId,ProcessStepId,Department,WorkerCount,DurationHours,IsCompleted,Note")] ProcessingTicket processingTicket)
+        // POST: /ProcessingTickets/Create
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(ProcessingTicket ticket)
         {
-            if (ModelState.IsValid)
-            {
-                _context.Add(processingTicket);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["ProcessStepId"] = new SelectList(_context.ProcessSteps, "Id", "Id", processingTicket.ProcessStepId);
-            ViewData["ProductionOrderId"] = new SelectList(_context.ProductionOrders, "Id", "Id", processingTicket.ProductionOrderId);
-            return View(processingTicket);
+            // lọc chi tiết trống
+            ticket.InputDetails = ticket.InputDetails
+                .Where(d => !string.IsNullOrWhiteSpace(d.MaterialName))
+                .ToList();
+            ticket.OutputDetails = ticket.OutputDetails
+                .Where(d => !string.IsNullOrWhiteSpace(d.MaterialName))
+                .ToList();
+
+            if (!ModelState.IsValid) return View(ticket);
+
+            // tự sinh mã phiếu theo format LSX-xxx-yy
+            // (bạn có thể thay logic này bằng service)
+            var count = await _context.ProcessingTickets.CountAsync() + 1;
+            ticket.Code = $"LSX-{count:000}-{ticket.ProcessStepId:00}";
+
+            _context.ProcessingTickets.Add(ticket);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
 
-        // GET: ProcessingTickets/Edit/5
+        // GET: /ProcessingTickets/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var processingTicket = await _context.ProcessingTickets.FindAsync(id);
-            if (processingTicket == null)
-            {
-                return NotFound();
-            }
-            ViewData["ProcessStepId"] = new SelectList(_context.ProcessSteps, "Id", "Id", processingTicket.ProcessStepId);
-            ViewData["ProductionOrderId"] = new SelectList(_context.ProductionOrders, "Id", "Id", processingTicket.ProductionOrderId);
-            return View(processingTicket);
+            if (id == null) return NotFound();
+            var ticket = await _context.ProcessingTickets
+                .Include(x => x.InputDetails)
+                .Include(x => x.OutputDetails)
+                .FirstOrDefaultAsync(x => x.Id == id);
+            if (ticket == null) return NotFound();
+            return View(ticket);
         }
 
-        // POST: ProcessingTickets/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Code,ProcessingDate,ProductionOrderId,ProcessStepId,Department,WorkerCount,DurationHours,IsCompleted,Note")] ProcessingTicket processingTicket)
+        // POST: /ProcessingTickets/Edit/5
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, ProcessingTicket ticket)
         {
-            if (id != processingTicket.Id)
-            {
-                return NotFound();
-            }
+            if (id != ticket.Id) return NotFound();
 
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(processingTicket);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!ProcessingTicketExists(processingTicket.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["ProcessStepId"] = new SelectList(_context.ProcessSteps, "Id", "Id", processingTicket.ProcessStepId);
-            ViewData["ProductionOrderId"] = new SelectList(_context.ProductionOrders, "Id", "Id", processingTicket.ProductionOrderId);
-            return View(processingTicket);
-        }
+            ticket.InputDetails = ticket.InputDetails
+                .Where(d => !string.IsNullOrWhiteSpace(d.MaterialName))
+                .ToList();
+            ticket.OutputDetails = ticket.OutputDetails
+                .Where(d => !string.IsNullOrWhiteSpace(d.MaterialName))
+                .ToList();
 
-        // GET: ProcessingTickets/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (!ModelState.IsValid) return View(ticket);
 
-            var processingTicket = await _context.ProcessingTickets
-                .Include(p => p.ProcessStep)
-                .Include(p => p.ProductionOrder)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (processingTicket == null)
-            {
-                return NotFound();
-            }
+            // xoá cũ, thêm mới
+            _context.ProcessingTicketInputDetails
+                .RemoveRange(_context.ProcessingTicketInputDetails.Where(d => d.ProcessingTicketId == id));
+            _context.ProcessingTicketOutputDetails
+                .RemoveRange(_context.ProcessingTicketOutputDetails.Where(d => d.ProcessingTicketId == id));
 
-            return View(processingTicket);
-        }
-
-        // POST: ProcessingTickets/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var processingTicket = await _context.ProcessingTickets.FindAsync(id);
-            if (processingTicket != null)
-            {
-                _context.ProcessingTickets.Remove(processingTicket);
-            }
+            _context.Update(ticket);
+            _context.ProcessingTicketInputDetails.AddRange(ticket.InputDetails);
+            _context.ProcessingTicketOutputDetails.AddRange(ticket.OutputDetails);
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool ProcessingTicketExists(int id)
+        // GET: /ProcessingTickets/Delete/5
+        public async Task<IActionResult> Delete(int? id)
         {
-            return _context.ProcessingTickets.Any(e => e.Id == id);
+            if (id == null) return NotFound();
+            var ticket = await _context.ProcessingTickets.FindAsync(id);
+            if (ticket == null) return NotFound();
+            return View(ticket);
+        }
+
+        // POST: /ProcessingTickets/Delete/5
+        [HttpPost, ActionName("Delete"), ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var ticket = await _context.ProcessingTickets.FindAsync(id);
+            if (ticket != null)
+            {
+                _context.ProcessingTicketInputDetails.RemoveRange(
+                    _context.ProcessingTicketInputDetails.Where(d => d.ProcessingTicketId == id));
+                _context.ProcessingTicketOutputDetails.RemoveRange(
+                    _context.ProcessingTicketOutputDetails.Where(d => d.ProcessingTicketId == id));
+                _context.ProcessingTickets.Remove(ticket);
+                await _context.SaveChangesAsync();
+            }
+            return RedirectToAction(nameof(Index));
         }
     }
 }

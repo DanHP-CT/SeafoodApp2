@@ -1,16 +1,31 @@
-﻿namespace SeafoodApp.Models
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace SeafoodApp.Models
 {
+    [Table("PurchaseOrderDetails")]
     public class PurchaseOrderDetail
     {
+        [Key]
         public int Id { get; set; }
+
+        [ForeignKey(nameof(PurchaseOrder))]
         public int PurchaseOrderId { get; set; }
-        public PurchaseOrder? PurchaseOrder { get; set; }
+        public PurchaseOrder PurchaseOrder { get; set; } = null!;
 
-        public string Size { get; set; } = string.Empty;
-        public decimal UnitPrice { get; set; }
-        public int Quantity { get; set; }
+        [Column("ProductName")]
+        public string ProductName { get; set; } = string.Empty;
 
-        // Tính thành tiền
-        public decimal Amount => UnitPrice * Quantity;
+        [Column("BatchNumber")]
+        public string BatchNumber { get; set; } = string.Empty;
+
+        [Column("Price")]
+        public decimal Price { get; set; }
+
+        [Column("Quantity")]
+        public decimal Quantity { get; set; }
+
+        [NotMapped]
+        public decimal Amount => Price * Quantity;
     }
 }

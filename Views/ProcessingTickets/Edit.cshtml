@@ -1,74 +1,63 @@
 ﻿@model SeafoodApp.Models.ProcessingTicket
-
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Sửa phiếu chế biến";
 }
+<h2>@ViewData["Title"]</h2>
 
-<h1>Edit</h1>
+<form asp-action="Edit" method="post">
+    <input type="hidden" asp-for="Id" />
+    <!-- Các trường giống Create... -->
+    <!-- ... -->
+    <hr />
+    <h4>Đầu vào</h4>
+    <table class="table" id="tblInput">
+        <thead>
+            <tr><th>Tên</th><th>SL</th><th>Lô</th><th></th></tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < Model.InputDetails.Count; i++)
+            {
+                <tr>
+                    <td><input name="InputDetails[@i].MaterialName" value="@Model.InputDetails.ElementAt(i).MaterialName" class="form-control" /></td>
+                    <td><input name="InputDetails[@i].Quantity" type="number" value="@Model.InputDetails.ElementAt(i).Quantity" class="form-control" /></td>
+                    <td><input name="InputDetails[@i].BatchNumber" value="@Model.InputDetails.ElementAt(i).BatchNumber" class="form-control" /></td>
+                    <td><button type="button" class="btn btn-danger" onclick="this.closest('tr').remove()">-</button></td>
+                </tr>
+            }
+            <tr>
+                <td colspan="4"><button type="button" class="btn btn-success" onclick="addInputRow(this)">Thêm</button></td>
+            </tr>
+        </tbody>
+    </table>
 
-<h4>ProcessingTicket</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Id" />
-            <div class="form-group">
-                <label asp-for="Code" class="control-label"></label>
-                <input asp-for="Code" class="form-control" />
-                <span asp-validation-for="Code" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ProcessingDate" class="control-label"></label>
-                <input asp-for="ProcessingDate" class="form-control" />
-                <span asp-validation-for="ProcessingDate" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ProductionOrderId" class="control-label"></label>
-                <select asp-for="ProductionOrderId" class="form-control" asp-items="ViewBag.ProductionOrderId"></select>
-                <span asp-validation-for="ProductionOrderId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ProcessStepId" class="control-label"></label>
-                <select asp-for="ProcessStepId" class="form-control" asp-items="ViewBag.ProcessStepId"></select>
-                <span asp-validation-for="ProcessStepId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Department" class="control-label"></label>
-                <input asp-for="Department" class="form-control" />
-                <span asp-validation-for="Department" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="WorkerCount" class="control-label"></label>
-                <input asp-for="WorkerCount" class="form-control" />
-                <span asp-validation-for="WorkerCount" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="DurationHours" class="control-label"></label>
-                <input asp-for="DurationHours" class="form-control" />
-                <span asp-validation-for="DurationHours" class="text-danger"></span>
-            </div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="IsCompleted" /> @Html.DisplayNameFor(model => model.IsCompleted)
-                </label>
-            </div>
-            <div class="form-group">
-                <label asp-for="Note" class="control-label"></label>
-                <input asp-for="Note" class="form-control" />
-                <span asp-validation-for="Note" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
-    </div>
-</div>
+    <h4>Đầu ra</h4>
+    <table class="table" id="tblOutput">
+        <thead><tr><th>Tên</th><th>SL</th><th>Lô</th><th></th></tr></thead>
+        <tbody>
+            @for (int i = 0; i < Model.OutputDetails.Count; i++)
+            {
+                <tr>
+                    <td><input name="OutputDetails[@i].MaterialName" value="@Model.OutputDetails.ElementAt(i).MaterialName" class="form-control" /></td>
+                    <td><input name="OutputDetails[@i].Quantity" type="number" value="@Model.OutputDetails.ElementAt(i).Quantity" class="form-control" /></td>
+                    <td><input name="OutputDetails[@i].BatchNumber" value="@Model.OutputDetails.ElementAt(i).BatchNumber" class="form-control" /></td>
+                    <td><button type="button" class="btn btn-danger" onclick="this.closest('tr').remove()">-</button></td>
+                </tr>
+            }
+            <tr>
+                <td colspan="4"><button type="button" class="btn btn-success" onclick="addOutputRow(this)">Thêm</button></td>
+            </tr>
+        </tbody>
+    </table>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+    <button type="submit" class="btn btn-primary">Lưu</button>
+    <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+</form>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @* Chèn lại script từ Create *@
+    <script>
+        let idxIn = @Model.InputDetails.Count, idxOut = @Model.OutputDetails.Count;
+        function addInputRow(btn) { /* ... giống Create ... */ }
+        function addOutputRow(btn) { /* ... giống Create ... */ }
+    </script>
 }

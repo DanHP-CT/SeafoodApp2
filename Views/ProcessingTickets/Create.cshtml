@@ -1,71 +1,118 @@
 ﻿@model SeafoodApp.Models.ProcessingTicket
-
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Tạo phiếu chế biến";
 }
+<h2>@ViewData["Title"]</h2>
 
-<h1>Create</h1>
-
-<h4>ProcessingTicket</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Code" class="control-label"></label>
-                <input asp-for="Code" class="form-control" />
-                <span asp-validation-for="Code" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ProcessingDate" class="control-label"></label>
-                <input asp-for="ProcessingDate" class="form-control" />
-                <span asp-validation-for="ProcessingDate" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ProductionOrderId" class="control-label"></label>
-                <select asp-for="ProductionOrderId" class ="form-control" asp-items="ViewBag.ProductionOrderId"></select>
-            </div>
-            <div class="form-group">
-                <label asp-for="ProcessStepId" class="control-label"></label>
-                <select asp-for="ProcessStepId" class ="form-control" asp-items="ViewBag.ProcessStepId"></select>
-            </div>
-            <div class="form-group">
-                <label asp-for="Department" class="control-label"></label>
-                <input asp-for="Department" class="form-control" />
-                <span asp-validation-for="Department" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="WorkerCount" class="control-label"></label>
-                <input asp-for="WorkerCount" class="form-control" />
-                <span asp-validation-for="WorkerCount" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="DurationHours" class="control-label"></label>
-                <input asp-for="DurationHours" class="form-control" />
-                <span asp-validation-for="DurationHours" class="text-danger"></span>
-            </div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="IsCompleted" /> @Html.DisplayNameFor(model => model.IsCompleted)
-                </label>
-            </div>
-            <div class="form-group">
-                <label asp-for="Note" class="control-label"></label>
-                <input asp-for="Note" class="form-control" />
-                <span asp-validation-for="Note" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+<form asp-action="Create" method="post">
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <label asp-for="ProductionOrderId" class="form-label">Lệnh sản xuất</label>
+            <input asp-for="ProductionOrderId" class="form-control" />
+        </div>
+        <div class="col-md-4">
+            <label asp-for="ProcessStepId" class="form-label">Công đoạn</label>
+            <input asp-for="ProcessStepId" class="form-control" />
+        </div>
+        <div class="col-md-4">
+            <label asp-for="ProcessingDate" class="form-label">Ngày chế biến</label>
+            <input asp-for="ProcessingDate" type="datetime-local" class="form-control" />
+        </div>
     </div>
-</div>
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <label asp-for="Department" class="form-label">Bộ phận</label>
+            <input asp-for="Department" class="form-control" />
+        </div>
+        <div class="col-md-4">
+            <label asp-for="WorkerCount" class="form-label">Số nhân công</label>
+            <input asp-for="WorkerCount" class="form-control" />
+        </div>
+        <div class="col-md-4">
+            <label asp-for="DurationHours" class="form-label">Thời gian (giờ)</label>
+            <input asp-for="DurationHours" class="form-control" />
+        </div>
+    </div>
+    <div class="mb-4">
+        <label asp-for="Note" class="form-label">Ghi chú</label>
+        <textarea asp-for="Note" class="form-control"></textarea>
+    </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+    <hr />
+    <h4>Đầu vào</h4>
+    <table class="table" id="tblInput">
+        <thead>
+            <tr>
+                <th>Tên</th>
+                <th>SL</th>
+                <th>Lô</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><input name="InputDetails[0].MaterialName" class="form-control" /></td>
+                <td><input name="InputDetails[0].Quantity" type="number" class="form-control" /></td>
+                <td><input name="InputDetails[0].BatchNumber" class="form-control" /></td>
+                <td><button type="button" class="btn btn-success" onclick="addInputRow(this)">+</button></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h4>Đầu ra</h4>
+    <table class="table" id="tblOutput">
+        <thead>
+            <tr>
+                <th>Tên</th>
+                <th>SL</th>
+                <th>Lô</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><input name="OutputDetails[0].MaterialName" class="form-control" /></td>
+                <td><input name="OutputDetails[0].Quantity" type="number" class="form-control" /></td>
+                <td><input name="OutputDetails[0].BatchNumber" class="form-control" /></td>
+                <td><button type="button" class="btn btn-success" onclick="addOutputRow(this)">+</button></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <button type="submit" class="btn btn-primary">Lưu</button>
+    <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+</form>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        let idxIn = 1, idxOut = 1;
+        function addInputRow(btn) {
+            let tbody = document.querySelector('#tblInput tbody');
+            let tr = tbody.querySelector('tr').cloneNode(true);
+            tr.querySelectorAll('input').forEach(i => {
+                let name = i.getAttribute('name').replace(/\d+/, idxIn);
+                i.setAttribute('name', name);
+                i.value = '';
+            });
+            tr.querySelector('button').className = 'btn btn-danger';
+            tr.querySelector('button').innerText = '-';
+            tr.querySelector('button').onclick = () => tr.remove();
+            tbody.append(tr);
+            idxIn++;
+        }
+        function addOutputRow(btn) {
+            let tbody = document.querySelector('#tblOutput tbody');
+            let tr = tbody.querySelector('tr').cloneNode(true);
+            tr.querySelectorAll('input').forEach(i => {
+                let name = i.getAttribute('name').replace(/\d+/, idxOut);
+                i.setAttribute('name', name);
+                i.value = '';
+            });
+            tr.querySelector('button').className = 'btn btn-danger';
+            tr.querySelector('button').innerText = '-';
+            tr.querySelector('button').onclick = () => tr.remove();
+            tbody.append(tr);
+            idxOut++;
+        }
+    </script>
 }
